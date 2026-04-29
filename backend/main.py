@@ -81,11 +81,7 @@ def extract_entities(text: str) -> dict:
         "organizations": [],
     }
 
-    # Skill extraction via keyword matching against our dictionary
-    text_lower = text.lower()
-    for skill in KNOWN_SKILLS:
-        if skill in text_lower:
-            entities["skills"].append(skill.title())
+    entities["skills"] = [s.title() for s in _find_skills_in_text(text)]
 
     # Named Entity Recognition for organizations
     for ent in doc.ents:
@@ -97,20 +93,33 @@ def extract_entities(text: str) -> dict:
     return entities
 
 
+def _find_skills_in_text(text: str) -> list:
+    """
+    Find known skills in text using word-boundary regex to avoid false positives.
+    For example, 'r' won't match inside 'programmer' and 'go' won't match 'good'.
+    """
+    text_lower = text.lower()
+    found = []
+    for skill in KNOWN_SKILLS:
+        pattern = r'(?<![a-zA-Z0-9_/\-])' + re.escape(skill) + r'(?![a-zA-Z0-9_/\-])'
+        if re.search(pattern, text_lower):
+            found.append(skill)
+    return found
+
+
 def compute_skill_match(resume_skills: list, job_description: str) -> dict:
     """
     Compare resume skills against a job description using keyword matching.
     Returns match score, matched skills, and missing skills.
     """
-    jd_lower = job_description.lower()
-    jd_skills = [skill for skill in KNOWN_SKILLS if skill in jd_lower]
+    jd_skills = _find_skills_in_text(job_description)
 
     resume_skills_lower = [s.lower() for s in resume_skills]
 
     matched = [s.title() for s in jd_skills if s in resume_skills_lower]
     missing = [s.title() for s in jd_skills if s not in resume_skills_lower]
 
-    score = round((len(matched) / len(jd_skills)) * 100) if jd_skills else 100
+    score = round((len(matched) / len(jd_skills)) * 100) if jd_skills else 0
 
     return {
         "match_score": score,
