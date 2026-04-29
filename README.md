@@ -14,7 +14,31 @@ A powerful web application built with **React**, **Tailwind CSS**, and **FastAPI
 
 ## Setup Instructions
 
-### 1. Backend (FastAPI)
+### Quick Start with Docker (Recommended)
+You can easily run the entire application using Docker Compose. Just run the following commands in your terminal:
+
+**For Linux/macOS:**
+```bash
+git clone https://github.com/Chirag2006-creator/Smart-Resume-Analyzer.git
+cd Smart-Resume-Analyzer
+export OPENROUTER_API_KEY="your_api_key_here"
+docker compose up -d
+```
+
+**For Windows (PowerShell):**
+```powershell
+git clone https://github.com/Chirag2006-creator/Smart-Resume-Analyzer.git
+cd Smart-Resume-Analyzer
+$env:OPENROUTER_API_KEY="your_api_key_here"
+docker compose up -d
+```
+After the containers build and start, open `http://localhost:5173` in your browser.
+
+---
+
+### Manual Setup (Without Docker)
+
+#### 1. Backend (FastAPI)
 Open a terminal in the project root:
 ```bash
 cd backend
